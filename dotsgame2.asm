@@ -8,6 +8,7 @@ newline: .asciiz "\n"
 user_input_row: .asciiz "Enter the row: "
 user_input_column: .asciiz "Enter the column: "
 invalid_input: .asciiz "Invalid input. Please enter valid a value. \n"
+repeated_input: .asciiz "Reapeated Input. \n"
 game_over: .asciiz "Game Over!\n"
 user_score: .asciiz "User score: "
 comp_score: .asciiz "Computer score: "
@@ -51,6 +52,7 @@ board_height: .word 13
 # Initialize the game board
 init_board:
     la $s0, board       # Load the address of the game board
+    la $s1, all_user_input		#load the address of input history
     li $t0, 0           # Initialize row counter
     li $t1, 0           # Initialize column counter
 
@@ -172,22 +174,36 @@ li $s6, 12
 	rem $t7, $t7, 2				#If true, ignore, else, invalid input
 	beqz $t7, user_invalid_input 
 	
-	la $s1, all_user_input			# Load the address of the user input array
-	
 	add $t8, $t4, 48			#add 48 to user input to the get ASCII value of them
 	add $t9, $t5, 48			#this converts the row and colume int to ASCII 
-check_for_reapeat_loop:
-	lbu $t
-	
-	#loop through all_user_input checking for matches or for 0, if 0 is found that means thats the last inputted value and jump to here and enter the 2 new values
-	la $s1, all_user_input			# Load the address of the user input array
-	sb $t8, 0($s1)				#load row number in ascii into all_user_input
-	addi $s1, $s1, 1 			#go to next space and repeat
-	sb $t9, 0($s1)
-	addi $s1, $s1, 1
+	j check_for_repeat_loop
 	
     j display_board
 
+
+check_for_repeat_loop:
+	lb $s2, 0($s1)
+	beqz $s2, if_equal_zero		#check if the first value in all user input is 0, if so check the second one
+not_equal_zero:	
+	#loop through all_user_input checking for matches or for 0, if 0 is found that means thats the last inputted value and jump to here and enter the 2 new values
+	lb $s2, 0($s1)
+	bne $s2, $t8, increment_history
+	lb $s2, 1($s1)
+	bne $s2, $t9, increment_history
+	li $v0, 4
+	la $a0, repeated_input
+	syscall
+	j take_user_input
+increment_history:
+	addi $s1, $s1, 2
+	j check_for_repeat_loop
+if_equal_zero:
+	lb $s2, 1($s1)
+	bnez $s2 not_equal_zero		#if the second one is not 0 then compare the user input to past input
+	sb $t8, 0($s1)				#if it is zero that means its a new input and is vaild
+	sb $t9, 1($s1)				#store it in the history
+	j display_board
+	
 user_invalid_input:
 	li $v0, 4
 	la $a0, invalid_input
