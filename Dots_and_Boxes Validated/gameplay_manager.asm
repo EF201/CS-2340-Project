@@ -113,6 +113,7 @@ not_equal_zero:
 	bne $s2, $t8, increment_history
 	lb $s2, 1($s1)
 	bne $s2, $t9, increment_history
+	beq $s6, 1, computer_move
 	li $v0, 4
 	la $a0, repeated_input
 	syscall
@@ -122,12 +123,12 @@ increment_history:
 	j check_for_repeat_loop
 if_equal_zero:
 	lb $s2, 1($s1)
-	bnez $s2 not_equal_zero				#if the second one is not 0 then compare the user input to past input
+	bnez $s2 not_equal_zero					#if the second one is not 0 then compare the user input to past input
 	sb $t8, 0($s1)						#if it is zero that means its a new input and is vaild
 	sb $t9, 1($s1)						#store it in the history
 	#j display_board
 	#j check_boxes						#since input is vaild check if it makes a box
-return_label:
+
 	jr $ra
 
 user_invalid_input:
@@ -165,6 +166,11 @@ computer_move:
 	add $t7, $t4, $t5			#Add row and column, check if sum is odd
 	rem $t7, $t7, 2				#If true, ignore, else, invalid input
 	beqz $t7, comp_invalid_input 
+	
+	add $t8, $t4, 48					#add 48 to user input to the get ASCII value of them
+	add $t9, $t5, 48					#this converts the row and colume int to ASCII 
+	li $s6, 1
+	j check_for_repeat_loop
 	
 	li $v0, 4
 	la $a0, comp_input
