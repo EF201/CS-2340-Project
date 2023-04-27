@@ -2,7 +2,7 @@
 end: .asciiz "Game Over.\n"
 user_display_score: .asciiz "User score: "
 comp_display_score: .asciiz "\nComputer score: "
-winner: .asciiz "Winner: "
+winner: .asciiz "\nWinner: "
 user_wins: .asciiz "User\n"
 comp_wins: .asciiz "Computer\n"
 tie: .asciiz "Tie\n"
@@ -235,7 +235,7 @@ game_over:
 	syscall
 	
 	li $v0, 1
-	lw $t4, user_score
+	lw $a0, user_score
 	syscall
 	
 	li $v0, 4
