@@ -95,16 +95,6 @@ take_user_input:
     		bgt $t1, $t3, user_invalid_input
     		
     		move $t5, $t1   # Move the row value from $t1 to $t2
-    		
-    	# Print the integer value to the console
-	li $v0, 1       # Set the system call code for printing an integer (1)
-	move $a0, $t4   # Move the integer value from $t0 to $a0
-	syscall         # Call the system call to print the integer
-    		
-	# Print the integer value to the console
-	li $v0, 1       # Set the system call code for printing an integer (1)
-	move $a0, $t5   # Move the integer value from $t0 to $a0
-	syscall         # Call the system call to print the integer
 
 	add $t7, $t4, $t5					#Add row and column, check if sum is odd
 	rem $t7, $t7, 2						#If true, ignore, else, invalid input
